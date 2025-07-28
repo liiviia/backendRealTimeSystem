@@ -1,14 +1,8 @@
-// backend/server.js
 const WebSocket = require('ws');
-
 
 const PORT = process.env.PORT || 8080;
 const server = require('http').createServer();
 const wss = new WebSocket.Server({ server });
-
-server.listen(PORT, () => {
-  console.log(`Server in ascolto sulla porta ${PORT}`);
-});
 
 let clients = [];
 
