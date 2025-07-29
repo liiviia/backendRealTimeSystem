@@ -1,18 +1,25 @@
-// server.js
 const express = require("express");
 const http = require("http");
 const WebSocket = require("ws");
 const fs = require("fs");
 const cors = require("cors");
 const path = require("path");
+const Filter = require("bad-words");
 
 const app = express();
-app.use(cors()); // 🔥 RISOLVE IL PROBLEMA DI CORS
+app.use(cors()); 
 
 const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
 
 let parole = [];
+
+const filter = new Filter();
+filter.addWords(
+  "cazzo", "merda", "stronzo", "vaffanculo", "porco", "puttana",
+  "troia", "bastardo", "culo", "minchia", "dio", "cristo", "madonna",
+  "gesù", "coglione", "figa", "coglioni", "merda", "stronzo"
+);
 
 // Serve il file .txt per il download
 app.get("/download", (req, res) => {
@@ -30,19 +37,32 @@ wss.on("connection", (ws) => {
 
   ws.on("message", (msg) => {
     const parola = msg.toString().trim();
-    if (parola) {
-      parole.push(parola);
-      fs.writeFileSync("parole.txt", parole.join("\n"));
+    if (!parola) return;
+
+    const isOffensive = filter.isProfane(parola);
+
+    const nuovaParola = {
+      text: parola,
+      offensive: isOffensive,
+    };
+
+    parole.push(nuovaParola);
+
+    // Se non è offensiva, salvala nel file
+    if (!isOffensive) {
+      const parolePulite = parole.filter(p => !p.offensive).map(p => p.text);
+      fs.writeFileSync("parole.txt", parolePulite.join("\n"));
+    }
+
       wss.clients.forEach((client) => {
         if (client.readyState === WebSocket.OPEN) {
           client.send(JSON.stringify(parole));
         }
       });
-    }
   });
 });
 
 const PORT = process.env.PORT || 8080;
 server.listen(PORT, () => {
-  console.log(`✅ Server in ascolto sulla porta ${PORT}`);
+  console.log(` Server in ascolto sulla porta ${PORT}`);
 });
