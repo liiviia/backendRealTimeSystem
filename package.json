@@ -10,9 +10,6 @@
   "author": "",
   "license": "ISC",
   "type": "commonjs",
-  "engines": {
-    "node": "18.x"                          
-  },
   "dependencies": {
     "bad-words": "^4.0.0",
     "cors": "^2.8.5",
