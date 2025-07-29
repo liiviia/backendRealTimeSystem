@@ -32,18 +32,6 @@ app.get("/download", (req, res) => {
   res.download(filePath);
 });
 
-// Rotta per pulire tutto
-app.post("/clear", (req, res) => {
-  // Svuota array parole
-  parole.length = 0;
-
-  // Elimina il file parole.txt se esiste
-  const filePath = path.join(__dirname, "parole.txt");
-  if (fs.existsSync(filePath)) {
-    fs.unlinkSync(filePath);
-  }
-});
-
 // WebSocket
 wss.on("connection", (ws) => {
   console.log("Client connesso");
@@ -72,10 +60,8 @@ wss.on("connection", (ws) => {
         if (client.readyState === WebSocket.OPEN) {
           client.send(JSON.stringify(parole));
         }
-      });      
+      });
   });
-  console.log(" Tutto pulito.");
-  res.status(200).json({ message: "Pulizia completata" });
 });
 
 const PORT = process.env.PORT || 8080;
