@@ -72,11 +72,10 @@ wss.on("connection", (ws) => {
         if (client.readyState === WebSocket.OPEN) {
           client.send(JSON.stringify(parole));
         }
-      });
-
-      res.status(200).json({ message: "Pulizia completata" });
-      
+      });      
   });
+  console.log(" Tutto pulito.");
+  res.status(200).json({ message: "Pulizia completata" });
 });
 
 const PORT = process.env.PORT || 8080;
